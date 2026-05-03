@@ -319,7 +319,14 @@ export default function ResellerCustomer() {
                   <div className="grid gap-4 mb-4 grid-cols-2">
                     <div className="col-span-2">
                       <label htmlFor="macaddress" className="flex mb-2  font-medium text-gray-900 dark:text-white">Mac Address</label>
-                      <input type="text" onChange={(e) => setIsMacAddress(e.target.value)} value={isMacAddress} name="macaddress" id="macaddress" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Enter Your Mac Address" required="" />
+                      <input type="text" onChange={(e) => setIsMacAddress(e.target.value)} value={isMacAddress} name="macaddress" id="macaddress"
+                       onChange={(e) => {
+                            let input = e.target.value;
+                            input = input.replace(/[^a-zA-Z0-9]/g, '');
+                            const formatted = input.match(/.{1,2}/g)?.join(':') || '';
+                            setIsMacAddress(formatted);
+                          }}
+                           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Enter Your Mac Address" required="" />
                     </div>
                     <div className='col-span-2'>
                       <label htmlFor="credit" className="flex mb-2 text-sm font-medium text-gray-900 dark:text-white">Credit</label>
