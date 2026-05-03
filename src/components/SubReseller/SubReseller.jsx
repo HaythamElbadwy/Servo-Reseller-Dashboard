@@ -144,7 +144,7 @@ export default function SubReseller() {
   }, []);
 
   const filteredSubResellers = allSubReseller.filter((item) =>
-    item.userName.toLowerCase().includes(searchQuery.toLowerCase())
+    item.userName?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
 
