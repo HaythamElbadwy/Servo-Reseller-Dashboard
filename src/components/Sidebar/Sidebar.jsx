@@ -8,7 +8,7 @@ import { toast } from 'react-toastify';
 export default function Sidebar() {
 
   const [isHoveredResellerCustomer, setIsHoveredResellerCustomer] = useState(false);
-  const [isHoveredProvider, setIsHoveredProvider] = useState(false);
+  // const [isHoveredProvider, setIsHoveredProvider] = useState(false);
   const [isHoveredLogOut, setIsHoveredLogOut] = useState(false);
   const [isHoveredSubReseller, setIsHoveredSubReseller] = useState(false);
   const [isAuthorize, setIsAuthorize] = useState(false);
@@ -195,7 +195,7 @@ useEffect(() => {
 
                 </li>
               )}
-              <li
+              {/* <li
                 className={`${styles.hover_container} ${isHoveredProvider ? `${styles.hovered}` : ""}`}
                 onMouseEnter={() => setIsHoveredProvider(true)}
                 onMouseLeave={() => setIsHoveredProvider(false)}
@@ -210,7 +210,7 @@ useEffect(() => {
                   )}
                 </NavLink>
 
-              </li>
+              </li> */}
               <li
                 className={`${styles.hover_container} ${isHoveredLogOut ? `${styles.hovered}` : ""}`}
                 onMouseEnter={() => setIsHoveredLogOut(true)}
