@@ -9,7 +9,10 @@ export default function ResellerCustomer() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setAllPage] = useState(0);
   const [isNewResellerCustomer, setIsNewResellerCustomer] = useState(false);
+  const [isReplaceUrl, setIsReplaceUrl] = useState(false);
   const [isMacAddress, setIsMacAddress] = useState("");
+  const [isNewHost, setIsNewHost] = useState("");
+  const [isOldHost, setIsOldHost] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [allResellerCustomer, setAllResellerCustomer] = useState([]);
   const [totalResellerSubscribtion, setTotalResellerSubscribtion] = useState(0);
@@ -17,7 +20,11 @@ export default function ResellerCustomer() {
   const [credit, setCredit] = useState("");
 
   function addSubscribtion() {
+    clearInput()
     setIsNewResellerCustomer(true)
+  }
+  function replaceUrl() {
+    setIsReplaceUrl(true)
   }
 
   /////////////////////// START GET RESELLER CUSTOMER FUNCTION////////////////
@@ -201,6 +208,84 @@ export default function ResellerCustomer() {
 
   ////////////////////////END ADD  NEW RESELLER CUSTOMER/////////////////////////////////////
 
+    ////////////////////////START ADD REPLACE URL//////////////////////////////
+  const changeHost = async () => {
+   
+
+    setIsLoading(true)
+    try {
+      const response = await fetch(`https://servo-back.onrender.com/reseller/changeHost`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'authorization': `servoM0${localStorage.getItem('authToken')}`
+        },
+        body: JSON.stringify({ oldHost: isOldHost, newHost: isNewHost })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        getResellerCustomer(currentPage)
+        toast.success(data.message, {
+          theme: 'dark'
+        })
+        setIsReplaceUrl(false)
+        // if (credit == "Life Time") {
+        //   setTotalResellerSubscribtion(prev => Math.max(prev - 2, 0));
+        // } else {
+        //   setTotalResellerSubscribtion(prev => Math.max(prev - 1, 0));
+        // }
+
+        clearInput()
+
+      } else {
+        switch (response.status) {
+          case 500:
+            toast.error(data.message, {
+              theme: "dark"
+            });
+          case 400:
+            toast.error(data.message, {
+              theme: "dark"
+            });
+          case 404:
+            toast.error(data.message, {
+              theme: "dark"
+            });
+            break;
+          default:
+            toast('An error occurred. Please try again.', {
+              theme: "dark"
+            });
+        }
+      }
+
+    } catch (err) {
+      console.error("Error Saving Faqs:", err);
+    } finally {
+      setIsLoading(false)
+    }
+  };
+
+  function handleAddNewHost() {
+    if (isNewHost == '' || isOldHost == '') {
+      toast("All faildes is Rquired!")
+    } else {
+      changeHost()
+    }
+
+
+
+  }
+  function clearInput() {
+    setIsNewHost('')
+    setIsOldHost('')
+
+  }
+
+  ////////////////////////END ADD  REPLACE URL/////////////////////////////////////
+
   ///////////////////////////START SEARCH RESELLER CUSTOMER////////////////////////////////////
   const getSearch = async (macAddress) => {
     setSearchResellerCustomer(macAddress)
@@ -255,6 +340,14 @@ export default function ResellerCustomer() {
             <input onChange={(e) => getSearch(e.target.value)} value={searchResellerCustomer} type="search" id="default-search" className="block w-full h-11 p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Search" required />
           </div>
           <button type="button"
+            onClick={replaceUrl}
+            className="text-[#185eb3] hover:text-white border
+           border-[#185eb3] hover:bg-[#185eb3] focus:ring-4 focus:outline-none
+            focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:border-blue-500 dark:text-blue-500 dark:hover:text-white
+             dark:hover:bg-blue-500 dark:focus:ring-blue-800">
+            <i className="fa-solid fa-plus mr-4"></i>
+            Replace Url</button>
+          <button type="button"
             onClick={addSubscribtion}
             className="text-[#185eb3] hover:text-white border
            border-[#185eb3] hover:bg-[#185eb3] focus:ring-4 focus:outline-none
@@ -262,7 +355,9 @@ export default function ResellerCustomer() {
              dark:hover:bg-blue-500 dark:focus:ring-blue-800">
             <i className="fa-solid fa-plus mr-4"></i>
             New Subscribtion</button>
+
         </div>
+
 
         <div className={`${styles.resellerCustomer_table} `}>
           <table className='table-auto w-full '>
@@ -319,14 +414,14 @@ export default function ResellerCustomer() {
                   <div className="grid gap-4 mb-4 grid-cols-2">
                     <div className="col-span-2">
                       <label htmlFor="macaddress" className="flex mb-2  font-medium text-gray-900 dark:text-white">Mac Address</label>
-                      <input type="text" onChange={(e) => setIsMacAddress(e.target.value)} value={isMacAddress} name="macaddress" id="macaddress"
-                       onChange={(e) => {
-                            let input = e.target.value;
-                            input = input.replace(/[^a-zA-Z0-9]/g, '');
-                            const formatted = input.match(/.{1,2}/g)?.join(':') || '';
-                            setIsMacAddress(formatted);
-                          }}
-                           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Enter Your Mac Address" required="" />
+                      <input type="text"  value={isMacAddress} name="macaddress" id="macaddress"
+                        onChange={(e) => {
+                          let input = e.target.value;
+                          input = input.replace(/[^a-zA-Z0-9]/g, '');
+                          const formatted = input.match(/.{1,2}/g)?.join(':') || '';
+                          setIsMacAddress(formatted);
+                        }}
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Enter Your Mac Address" required="" />
                     </div>
                     <div className='col-span-2'>
                       <label htmlFor="credit" className="flex mb-2 text-sm font-medium text-gray-900 dark:text-white">Credit</label>
@@ -347,6 +442,55 @@ export default function ResellerCustomer() {
                       : 'Add'}
                   </button>
                   <button type="submit" onClick={() => setIsNewResellerCustomer(false)}
+                    className="text-white mr-5 inline-flex items-center bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-700">
+                    Cancel</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          : ''}
+
+        {isReplaceUrl ?
+          <div id="popup-modal" tabindex="-1" className="fixed backdrop-blur-sm z-[9999] top-0 left-0 right-0 flex justify-center items-center w-full h-screen bg-black bg-opacity-50 ">
+            <div className="relative p-4 w-full max-w-md max-h-full">
+              <div className="relative bg-white rounded-lg shadow-sm dark:bg-gray-700">
+                <div className="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600 border-gray-200">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    Change Host
+                  </h3>
+                  <button type="button" onClick={() => setIsReplaceUrl(false)} className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-toggle="crud-modal">
+                    <svg className="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                      <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                    </svg>
+                    <span className="sr-only">Close modal</span>
+                  </button>
+                </div>
+                <div className="p-4 md:p-5">
+                  <div className="grid gap-4 mb-4 grid-cols-2">
+                    <div className="col-span-2">
+                      <label htmlFor="macaddress" className="flex mb-2  font-medium text-gray-900 dark:text-white">Old URL</label>
+                      <input type="text" onChange={(e) => setIsOldHost(e.target.value)} value={isOldHost} name="macaddress" id="macaddress"
+                      
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Enter Your Old Url" required="" />
+                    </div>
+                    <div className='col-span-2'>
+                      <label htmlFor="macaddress" className="flex mb-2  font-medium text-gray-900 dark:text-white">New URL</label>
+                      <input type="text" onChange={(e) => setIsNewHost(e.target.value)} value={isNewHost} name="macaddress" id="macaddress"
+                     
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Enter Your New Url" required="" />
+
+                    </div>
+                  </div>
+
+
+                  <button type="submit"
+                    onClick={handleAddNewHost}
+                    className="text-white mr-5 inline-flex items-center bg-[#185eb3] hover:bg-b[#185eb3] focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-800 dark:focus:ring-blue-800">
+                    {isLoading ?
+                      <i className='fas fa-spinner fa-spin text-2xl'></i>
+                      : 'Add'}
+                  </button>
+                  <button type="submit" onClick={() => setIsReplaceUrl(false)}
                     className="text-white mr-5 inline-flex items-center bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-700">
                     Cancel</button>
                 </div>
